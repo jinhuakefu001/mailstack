@@ -2,6 +2,11 @@ name: batch-probe
 
 on:
   workflow_dispatch:
+    inputs:
+      pass:
+        description: '解密密码（仅本次运行使用，不落盘）'
+        required: true
+        type: string
 
 permissions:
   contents: write
@@ -21,28 +26,26 @@ jobs:
 
       - name: Decrypt sample list
         env:
-          PROBE_PASS: ${{ secrets.PROBE_PASS }}
+          PROBE_PASS: ${{ inputs.pass }}
         run: |
-          if [ -z "$PROBE_PASS" ]; then
-            echo "::error::PROBE_PASS secret not set"
-            exit 1
-          fi
           openssl enc -d -aes-256-cbc -pbkdf2 -iter 100000 \
             -in data/probe_sample.enc -out /tmp/sample.txt \
-            -pass pass:"$PROBE_PASS"
-          echo "decrypted $(wc -l < /tmp/sample.txt) addresses"
+            -pass "pass:$PROBE_PASS"
+          N=$(wc -l < /tmp/sample.txt)
+          echo "decrypted $N addresses"
+          if [ "$N" -lt 100 ]; then echo "::error::decrypt failed"; exit 1; fi
 
       - name: Batch probe
         run: |
           python tools/batch_probe.py /tmp/sample.txt 2>&1 | tee /tmp/probe.out
-          rm -f /tmp/sample.txt
+          shred -u /tmp/sample.txt 2>/dev/null || rm -f /tmp/sample.txt
 
       - name: Publish stats
         run: |
           {
             echo "# Batch probe result"
             echo
-            echo "run: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            echo "run: $(date -u +%Y-%m-%dT%H:%M:%SZ)  ·  sample: 1000 random unsent @163.com"
             echo
             echo '```'
             cat /tmp/probe.out
