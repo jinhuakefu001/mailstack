@@ -2,10 +2,6 @@ name: email-probe
 
 on:
   workflow_dispatch:
-  push:
-    paths:
-      - 'tools/**'
-      - '.github/workflows/email-probe.yml'
 
 permissions:
   contents: write
