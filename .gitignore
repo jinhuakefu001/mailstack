@@ -1,0 +1,29 @@
+# 追踪数据
+tracking/data/
+*.db
+*.sqlite
+*.sqlite3
+*.db-wal
+*.db-shm
+
+# 证书与密钥（绝对不能提交）
+*.pem
+*.key
+*.crt
+*.csr
+*.p12
+*.pfx
+*_domainkey*
+!**/_domainkey.txt.example
+
+# 真实配置（含服务器信息）
+local.conf
+*.local.conf
+
+# 编辑器
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+*~
+*.swp
