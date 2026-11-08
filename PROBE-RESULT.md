@@ -1,6 +1,6 @@
 # email-probe result
 
-run: 2026-11-08T02:38:56Z
+run: 2026-11-08T02:43:22Z
 ```
 === outbound port 25 reachability ===
   mx3.qq.com:25  OK
@@ -17,7 +17,7 @@ postmaster@yunzexinda.com                      exists?       250 2.1.5 Ok (via _
                                                              -> 自建邮局管理员，存在
 zzzzzzz999999888888@163.com                    NOT_EXIST     550 User not found: zzzzzzz999999888888@163.com (via 163mx01.mxmail.netease.com)
                                                              -> 163 上几乎不存在
-qwertyuiop1234567890@gmail.com                 exists?       250 2.1.5 OK 586e51a60fabf-4ade6a48d04si971612fac.232  (via gmail-smtp-in.l.google.com)
+qwertyuiop1234567890@gmail.com                 exists?       250 2.1.5 OK 46e09a7af769-85f4fbf95dbsi825364a34.134 - (via gmail-smtp-in.l.google.com)
                                                              -> Gmail 上几乎不存在
 test@this-domain-should-not-exist-xyz123.com   dns_error     NXDOMAIN: The DNS query name does not exist: this-domain-should-not-ex
                                                              -> 域名不存在
