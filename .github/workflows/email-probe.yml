@@ -1,0 +1,58 @@
+name: email-probe
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'tools/**'
+      - '.github/workflows/email-probe.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - run: pip install dnspython
+
+      - name: Test outbound port 25
+        run: |
+          {
+            echo "=== outbound port 25 reachability ==="
+            for h in mx3.qq.com 163mx01.mxmail.netease.com gmail-smtp-in.l.google.com; do
+              if timeout 8 bash -c "cat < /dev/null > /dev/tcp/$h/25" 2>/dev/null; then
+                echo "  $h:25  OK"
+              else
+                echo "  $h:25  BLOCKED"
+              fi
+            done
+            echo
+          } | tee probe-result.txt
+
+      - name: Probe sample addresses
+        run: python tools/verify_email.py 2>&1 | tee -a probe-result.txt
+
+      - name: Commit result
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          {
+            echo "# email-probe result"
+            echo
+            echo "run: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            echo '```'
+            cat probe-result.txt
+            echo '```'
+          } > PROBE-RESULT.md
+          rm -f probe-result.txt
+          git add PROBE-RESULT.md
+          git commit -m "chore: email probe result [skip ci]" || echo "no change"
+          git push
